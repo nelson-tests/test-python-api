@@ -11,7 +11,8 @@ def home():
 def get_data():
     response = {
         'message': 'Hello, Python API!',
-        'rightNow': datetime.datetime.now(datetime.timezone.utc)
+        'rightNow': datetime.datetime.now(datetime.timezone.utc),
+        'version': '1.0.0'
     }
     return jsonify(response)
 
