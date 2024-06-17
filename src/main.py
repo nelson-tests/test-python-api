@@ -12,7 +12,7 @@ def get_data():
     response = {
         'message': 'Hello, Python API!',
         'rightNow': datetime.datetime.now(datetime.timezone.utc),
-        'version': '1.3.0'
+        'version': '1.2.2'
     }
     return jsonify(response)
 

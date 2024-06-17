@@ -90,7 +90,11 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
 
-    - name: Save Docker Image
+    - name: 'Show Docker Image'
+      run: |
+        docker image ls
+
+    - name: 'Save Docker Image'
       run: |
         docker save -o ${{ env.IMAGE_NAME }}.tar ${{ env.IMAGE_NAME }}:${{ steps.semantic-release.outputs.new_release_version }}
 
