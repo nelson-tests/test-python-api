@@ -83,6 +83,7 @@ jobs:
     name: 'Publish Docker Image to Docker Hub'
     runs-on: ubuntu-latest
     environment: PROD
+    needs: DEV
     env:
       IMAGE_NAME: 'test-python-api'
 
