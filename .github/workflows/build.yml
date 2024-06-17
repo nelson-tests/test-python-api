@@ -1,0 +1,56 @@
+name: 'Build'
+
+
+on:
+  workflow_dispatch: # To can dispatch manually
+
+  push: # First pipeline to run when deploy a new version
+    branches:
+      - main
+    # TODO: working here
+    # paths:
+    #   - "src/**" # Only run when exists changes in source code
+
+
+
+jobs:
+
+  build:
+    name: "Build Image"
+    runs-on: 'ubuntu-latest'
+
+    steps:
+    - name: "Checkout"
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+
+    - name: Semantic Release
+      id: 'semantic-release'
+      uses: cycjimmy/semantic-release-action@v4.1.0
+      with:
+        dry_run: true
+        semantic_version: 22.0.8
+        extra_plugins: |
+          semantic-release-plugin-csproj
+          @semantic-release/changelog
+          @semantic-release/git
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: "New version"
+      run: |
+        echo "Published new version?: ${{ steps.semantic-release.outputs.new_release_published }}"
+        echo "New version: ${{ steps.semantic-release.outputs.new_release_version }}"
+        echo "Major: ${{ steps.semantic-release.outputs.new_release_major_version }}"
+        echo "Minor: ${{ steps.semantic-release.outputs.new_release_minor_version }}"
+        echo "Patch: ${{ steps.semantic-release.outputs.new_release_patch_version }}"
+        echo "Notes: ${{ steps.semantic-release.outputs.new_release_notes }}"
+        echo "GitHead: ${{ steps.semantic-release.outputs.new_release_git_head }}"
+        echo "GitTag: ${{ steps.semantic-release.outputs.new_release_git_tag }}"
+        echo "**************"
+        echo "Last version: ${{ steps.semantic-release.outputs.last_release_version }}"
+        echo "Last GitHead: ${{ steps.semantic-release.outputs.last_release_git_head }}"
+        echo "Last GitTag: ${{ steps.semantic-release.outputs.last_release_git_tag }}"
