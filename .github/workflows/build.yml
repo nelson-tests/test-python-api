@@ -70,7 +70,7 @@ jobs:
 
     - name: Extract metadata (tags, labels) for Docker
       id: meta
-      uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+      uses: docker/metadata-action@5.5.1
       with:
         images: ${{ env.IMAGE_NAME }}
         tags: |
@@ -81,3 +81,22 @@ jobs:
       run: |
         echo "Show metadata"
         echo "Tags: ${{ steps.meta.outputs.tags }}"
+
+    - name: 'Build and push Docker image'
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Save Docker Image
+      run: |
+        docker save -o ${{ env.IMAGE_NAME }}.tar ${{ env.IMAGE_NAME }}:${{ steps.semantic-release.outputs.new_release_version }}
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ env.IMAGE_NAME }}
+        path: ${{ env.IMAGE_NAME }}.tar
+        retention-days: 1
