@@ -33,7 +33,6 @@ jobs:
         dry_run: true
         semantic_version: 22.0.8
         extra_plugins: |
-          semantic-release-plugin-csproj
           @semantic-release/changelog
           @semantic-release/git
       env:
