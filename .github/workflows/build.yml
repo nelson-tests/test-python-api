@@ -7,9 +7,10 @@ on:
   push: # First pipeline to run when deploy a new version
     branches:
       - main
-    # TODO: working here
-    # paths:
-    #   - "src/**" # Only run when exists changes in source code
+    paths:
+      - "src/**"
+      - 'Dockerfile'
+      - 'requirements.txt'
 
 
 
@@ -23,12 +24,6 @@ jobs:
   build:
     name: "Build Image"
     runs-on: 'ubuntu-latest'
-    # permissions:
-    #   contents: write
-    #   packages: write
-    #   issues: write
-    #   pull-requests: write
-    #   actions: write
 
     steps:
     - name: "Checkout"
@@ -82,11 +77,11 @@ jobs:
         echo "Show metadata"
         echo "Tags: ${{ steps.meta.outputs.tags }}"
 
-    - name: 'Build and push Docker image'
+    - name: 'Build and'
       uses: docker/build-push-action@v5
       with:
         context: .
-        push: true
+        push: false
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
 
