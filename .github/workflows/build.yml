@@ -23,6 +23,12 @@ jobs:
   build:
     name: "Build Image"
     runs-on: 'ubuntu-latest'
+    permissions:
+      contents: write
+      packages: write
+      issues: write
+      pull-requests: write
+      actions: write
 
     steps:
     - name: "Checkout"
@@ -41,7 +47,7 @@ jobs:
           @semantic-release/changelog
           @semantic-release/git
       env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+#        GH_TOKEN: ${{ secrets.GH_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: "New version"
