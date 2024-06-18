@@ -94,11 +94,11 @@ jobs:
 
     - name: 'Add Docker Image Tag for specific version'
       run: |
-        docker tag ${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+        docker tag ${{ env.BASE_IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
 
     - name: 'Add Docker Image Tag for latest version'
       run: |
-        docker tag ${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ env.IMAGE_NAME }}/${{ env.IMAGE_NAME }}:latest
+        docker tag ${{ env.BASE_IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ env.IMAGE_NAME }}/${{ env.IMAGE_NAME }}:latest
 
     - name: 'Push Docker Image to GitHub Container Registry'
       run: |
