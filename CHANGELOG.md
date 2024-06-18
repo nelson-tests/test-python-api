@@ -1,3 +1,10 @@
+## [1.2.4](https://github.com/nelson-tests/test-python-api/compare/v1.2.3...v1.2.4) (2024-06-18)
+
+
+### Bug Fixes
+
+* version 1.2.5 ([eda5cec](https://github.com/nelson-tests/test-python-api/commit/eda5cec5fdce7be8edda392081b0ae157bc2f9e2))
+
 ## [1.2.3](https://github.com/nelson-tests/test-python-api/compare/v1.2.2...v1.2.3) (2024-06-17)
 
 
