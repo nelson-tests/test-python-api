@@ -94,8 +94,8 @@ jobs:
 
     - name: 'Add Docker Image Tags'
       run: |
-        docker tag ${{ env.BASE_IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
-        docker tag ${{ env.BASE_IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ env.IMAGE_NAME }}:latest
+        docker tag ${{ env.BASE_IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+        docker tag ${{ env.BASE_IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
     - name: 'Show Docker Image' # TODO: Remove this step
       run: |
