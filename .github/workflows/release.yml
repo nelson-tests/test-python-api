@@ -20,18 +20,31 @@ env:
 
 
 jobs:
-  build:
-    name: 'Building Docker Image'
+  cancel-pending-approvals:
+    name: 'Cancel Pending Approvals'
     runs-on: ubuntu-latest
 
     steps:
-    - run: |
-        echo "Building Docker Image"
-        echo "github.ref: ${{ github.ref }}"
-        echo "github.repository: ${{ github.repository }}"
-      name: 'Building Docker Image'
+    - name: 'Cancel Pending Deployments'
+      run: |
+        PENDING_DEPLOYMENTS=$(gh api repos/${{ github.repository }}/deployments \
+          --jq '.[] | select(.state == "in_progress" or .state == "queued") | .id')
 
+        for deployment_id in $PENDING_DEPLOYMENTS; do
+          echo "Canceling deployment $deployment_id"
+          gh api repos/${{ github.repository }}/deployments/$deployment_id/statuses \
+            -f state=inactive \
+            -f log_url=${{ github.event.workflow_run.html_url }} \
+            -f description="Superseded by a new commit" \
+            -F environment_url=${{ github.server_url }}/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        done
 
+  build:
+    name: 'Building Docker Image'
+    runs-on: ubuntu-latest
+    needs: cancel-pending-approvals
+
+    steps:
     - name: 'Checkout'
       uses: actions/checkout@v4
 
