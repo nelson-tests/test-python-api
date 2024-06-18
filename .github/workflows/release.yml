@@ -103,8 +103,10 @@ jobs:
 
     - name: 'Push Docker Image to GitHub Container Registry'
       run: |
-        docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
-        docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+        docker push --all-tags ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+# docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+# docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
 
 
 
