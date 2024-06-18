@@ -88,27 +88,18 @@ jobs:
       run: |
         docker load -i ${{ env.BASE_IMAGE_NAME }}.tar
 
-    - name: 'Extract metadata (tags, labels) for Docker'
-      id: meta
-      uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-      with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-        tags: |
-          ${{ steps.tag.outputs.tag }}
-          latest
-
-    - name: 'Show metadata'
+    - name: 'Add Docker Image Tag for specific version'
       run: |
-        echo "Show metadata"
-        echo "Tags: ${{ steps.meta.outputs.tags }}"
+        docker tag ${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
 
-    - name: 'Build and push Docker image'
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+    - name: 'Add Docker Image Tag for latest version'
+      run: |
+        docker tag ${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ env.IMAGE_NAME }}:latest
+
+    - name: 'Push Docker Image to GitHub Container Registry'
+      run: |
+        docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+        docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
 
 
