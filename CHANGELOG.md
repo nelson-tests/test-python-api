@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/nelson-tests/test-python-api/compare/v1.2.5...v1.3.0) (2024-06-18)
+
+
+### Features
+
+* New version 1.2.6 ([c578fac](https://github.com/nelson-tests/test-python-api/commit/c578fac692e2585240cb00f7b9e70f55a11a67a8))
+
 ### Bug Fixes
 
 * version 1.2.5 ([6c6c210](https://github.com/nelson-tests/test-python-api/commit/6c6c21097acf892757e581998769ef54c83082fc))
