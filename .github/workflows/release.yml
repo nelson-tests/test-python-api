@@ -88,10 +88,6 @@ jobs:
       run: |
         docker load -i ${{ env.BASE_IMAGE_NAME }}.tar
 
-    - name: 'Show Docker Image' # TODO: Remove this step
-      run: |
-        docker image ls
-
     - name: 'Add Docker Image Tags'
       run: |
         docker tag ${{ env.BASE_IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
@@ -104,8 +100,6 @@ jobs:
     - name: 'Push Docker Image to GitHub Container Registry'
       run: |
         docker push --all-tags ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-# docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
-# docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
 
 
@@ -115,13 +109,11 @@ jobs:
     runs-on: ubuntu-latest
     environment: PROD
     needs: dev-release
-    env:
-      IMAGE_NAME: 'test-python-api'
 
     steps:
 
-    - name: Download artifact
-      uses: actions/download-artifact@v3
+    - name: 'Download artifact'
+      uses: actions/download-artifact@v4
       with:
         name: ${{ env.BASE_IMAGE_NAME }}
 
@@ -146,24 +138,15 @@ jobs:
       run: |
         docker image ls
 
-    - name: Extract metadata (tags, labels) for Docker
-      id: meta
-      uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-      with:
-        images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
-        tags: |
-          ${{ steps.tag.outputs.tag }}
-          latest
-
-    - name: 'Show metadata'
+    - name: 'Add Docker Image Tags'
       run: |
-        echo "Show metadata"
-        echo "Tags: ${{ steps.meta.outputs.tags }}"
+        docker tag ${{ env.BASE_IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ secrets.DOCKERHUB_USERNAME  }}/${{ env.BASE_IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+        docker tag ${{ env.BASE_IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ secrets.DOCKERHUB_USERNAME  }}/${{ env.BASE_IMAGE_NAME }}:latest
 
-    - name: 'Build and push Docker image'
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+    - name: 'Show Docker Image' # TODO: Remove this step
+      run: |
+        docker image ls
+
+    - name: 'Push Docker Image to GitHub Container Registry'
+      run: |
+        docker push --all-tags ${{ secrets.DOCKERHUB_USERNAME  }}/${{ env.BASE_IMAGE_NAME }}
