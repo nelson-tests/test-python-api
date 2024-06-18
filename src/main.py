@@ -14,8 +14,7 @@ def get_data():
         'rightNow': datetime.datetime.now(datetime.timezone.utc),
         'data': [
             {'name': 'Alice', 'age': 25},
-            {'name': 'Bob', 'age': 30},
-            {'name': 'Charlie', 'age': 35}
+            {'name': 'Bob', 'age': 30}
         ]
     }
     return jsonify(response)
