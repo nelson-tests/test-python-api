@@ -92,13 +92,14 @@ jobs:
       run: |
         docker image ls
 
-    - name: 'Add Docker Image Tag for specific version'
+    - name: 'Add Docker Image Tags'
       run: |
         docker tag ${{ env.BASE_IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+        docker tag ${{ env.BASE_IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ env.IMAGE_NAME }}:latest
 
-    - name: 'Add Docker Image Tag for latest version'
+    - name: 'Show Docker Image' # TODO: Remove this step
       run: |
-        docker tag ${{ env.BASE_IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ env.IMAGE_NAME }}/${{ env.IMAGE_NAME }}:latest
+        docker image ls
 
     - name: 'Push Docker Image to GitHub Container Registry'
       run: |

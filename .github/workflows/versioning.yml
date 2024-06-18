@@ -41,15 +41,5 @@ jobs:
 
     - name: "New version"
       run: |
-        echo "Published new version?: ${{ steps.semantic-release.outputs.new_release_published }}"
+        echo "Published new version: ${{ steps.semantic-release.outputs.new_release_published }}"
         echo "New version: ${{ steps.semantic-release.outputs.new_release_version }}"
-        echo "Major: ${{ steps.semantic-release.outputs.new_release_major_version }}"
-        echo "Minor: ${{ steps.semantic-release.outputs.new_release_minor_version }}"
-        echo "Patch: ${{ steps.semantic-release.outputs.new_release_patch_version }}"
-        echo "Notes: ${{ steps.semantic-release.outputs.new_release_notes }}"
-        echo "GitHead: ${{ steps.semantic-release.outputs.new_release_git_head }}"
-        echo "GitTag: ${{ steps.semantic-release.outputs.new_release_git_tag }}"
-        echo "**************"
-        echo "Last version: ${{ steps.semantic-release.outputs.last_release_version }}"
-        echo "Last GitHead: ${{ steps.semantic-release.outputs.last_release_git_head }}"
-        echo "Last GitTag: ${{ steps.semantic-release.outputs.last_release_git_tag }}"
