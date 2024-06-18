@@ -104,7 +104,7 @@ jobs:
     name: 'Publish Docker Image to Docker Hub'
     runs-on: ubuntu-latest
     environment: PROD
-   needs: dev-release
+    needs: dev-release
 
     steps:
 
