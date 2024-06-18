@@ -35,7 +35,7 @@ jobs:
       run: |
         docker build -f Dockerfile . -t ${{ env.BASE_IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
 
-    - name: 'Show Docker Image'
+    - name: 'Show Docker Image' # TODO: Remove this step
       run: |
         docker image ls
 
@@ -88,13 +88,17 @@ jobs:
       run: |
         docker load -i ${{ env.BASE_IMAGE_NAME }}.tar
 
+    - name: 'Show Docker Image' # TODO: Remove this step
+      run: |
+        docker image ls
+
     - name: 'Add Docker Image Tag for specific version'
       run: |
-        docker tag ${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+        docker tag ${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
 
     - name: 'Add Docker Image Tag for latest version'
       run: |
-        docker tag ${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ env.IMAGE_NAME }}:latest
+        docker tag ${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ${{ env.IMAGE_NAME }}/${{ env.IMAGE_NAME }}:latest
 
     - name: 'Push Docker Image to GitHub Container Registry'
       run: |
@@ -135,6 +139,10 @@ jobs:
       run: |
         docker load -i ${{ env.BASE_IMAGE_NAME }}.tar
 
+    - name: 'Show Docker Image' # TODO: Remove this step
+      run: |
+        docker image ls
+
     - name: Extract metadata (tags, labels) for Docker
       id: meta
       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
@@ -156,4 +164,3 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        
