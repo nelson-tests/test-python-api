@@ -10,26 +10,15 @@ on:
     branches:
     - main
 
-# env:
-#   IMAGE_NAME: 'test-python-api'
-#   IMAGE_TAG: ${{ github.run_number }}
 
-# env:
-#   REGISTRY: ghcr.io
-#   IMAGE_NAME: ${{ github.repository }}
-#   IMAGE_TAG: ${{ github.run_number }}
+env:
+  BASE_IMAGE_NAME: 'test-python-api'
 
 
 jobs:
-  dev-release:
-    name: 'Publish Docker Image to GitHub Container Registry'
+  build:
+    name: 'Building Docker Image'
     runs-on: ubuntu-latest
-    environment: DEV
-    env:
-      REGISTRY: ghcr.io
-      IMAGE_NAME: ${{ github.repository }}
-#     permissions:
-#       packages: write
 
     steps:
     - name: 'Checkout'
@@ -39,11 +28,51 @@ jobs:
       id: tag
       uses: dawidd6/action-get-tag@v1
 
-    - name: 'Get version number'
+    - name: 'Set up Docker Buildx'
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker
       run: |
-        version_from_tag="${{ steps.tag.outputs.tag }}"
-        version="${version_from_tag#v}"
-        echo "version=$version"
+        docker build -f Dockerfile . -t ${{ env.BASE_IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+
+    - name: 'Show Docker Image'
+      run: |
+        docker image ls
+
+    - name: 'Save Docker Image'
+      run: |
+        docker save -o ${{ env.BASE_IMAGE_NAME }}.tar ${{ env.BASE_IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ env.BASE_IMAGE_NAME }}
+        path: ${{ env.BASE_IMAGE_NAME }}.tar
+        retention-days: 1
+
+
+
+  dev-release:
+    name: 'Publish Docker Image to GitHub Container Registry'
+    runs-on: ubuntu-latest
+    environment: DEV
+    needs: build
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
+    permissions:
+      packages: write
+
+    steps:
+
+    - name: 'Download artifact'
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ env.BASE_IMAGE_NAME }}
+
+    - name: 'Get tag'
+      id: tag
+      uses: dawidd6/action-get-tag@v1
 
     - name: 'Set up Docker Buildx'
       uses: docker/setup-buildx-action@v3
@@ -55,13 +84,17 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Load & Push Docker Image
+      run: |
+        docker load -i ${{ env.BASE_IMAGE_NAME }}.tar
+
     - name: 'Extract metadata (tags, labels) for Docker'
       id: meta
-      uses: docker/metadata-action@v5.5.1
+      uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
-          ${{ env.IMAGE_TAG }}
+          ${{ steps.tag.outputs.tag }}
           latest
 
     - name: 'Show metadata'
@@ -69,13 +102,13 @@ jobs:
         echo "Show metadata"
         echo "Tags: ${{ steps.meta.outputs.tags }}"
 
-#     - name: 'Build and push Docker image'
-#       uses: docker/build-push-action@v5
-#       with:
-#         context: .
-#         push: true
-#         tags: ${{ steps.meta.outputs.tags }}
-#         labels: ${{ steps.meta.outputs.labels }}
+    - name: 'Build and push Docker image'
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
 
 
 
@@ -83,24 +116,23 @@ jobs:
     name: 'Publish Docker Image to Docker Hub'
     runs-on: ubuntu-latest
     environment: PROD
-    needs: DEV
+    needs: dev-release
     env:
       IMAGE_NAME: 'test-python-api'
 
     steps:
-    - name: 'Checkout'
-      uses: actions/checkout@v4
+
+    - name: Download artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ env.BASE_IMAGE_NAME }}
 
     - name: 'Get tag'
       id: tag
       uses: dawidd6/action-get-tag@v1
 
-    - name: 'Get version number'
-      run: |
-        version_from_tag="${{ steps.tag.outputs.tag }}"
-        version="${version_from_tag#v}"
-        echo "version=$version"
-#        echo "version=$version" >> "$GITHUB_ENV"
+    - name: 'Set up Docker Buildx'
+      uses: docker/setup-buildx-action@v3
 
     - name: 'Log in to Docker Hub'
       uses: docker/login-action@v3
@@ -108,13 +140,17 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+    - name: Load & Push Docker Image
+      run: |
+        docker load -i ${{ env.BASE_IMAGE_NAME }}.tar
+
     - name: Extract metadata (tags, labels) for Docker
       id: meta
       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
       with:
         images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
         tags: |
-          ${{ env.IMAGE_TAG }}
+          ${{ steps.tag.outputs.tag }}
           latest
 
     - name: 'Show metadata'
@@ -122,10 +158,10 @@ jobs:
         echo "Show metadata"
         echo "Tags: ${{ steps.meta.outputs.tags }}"
 
-#     - name: 'Build and push Docker image'
-#       uses: docker/build-push-action@v5
-#       with:
-#         context: .
-#         push: true
-#         tags: ${{ steps.meta.outputs.tags }}
-#         labels: ${{ steps.meta.outputs.labels }}
+    - name: 'Build and push Docker image'
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
