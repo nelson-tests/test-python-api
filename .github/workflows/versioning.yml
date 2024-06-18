@@ -1,4 +1,4 @@
-name: 'Build'
+name: 'Versioning'
 
 
 on:
@@ -13,12 +13,6 @@ on:
       - 'requirements.txt'
 
 
-
-env:
-  IMAGE_NAME: 'test-python-api'
-
-
-
 jobs:
 
   build:
@@ -26,6 +20,7 @@ jobs:
     runs-on: 'ubuntu-latest'
 
     steps:
+
     - name: "Checkout"
       uses: actions/checkout@v4
       with:
@@ -36,7 +31,6 @@ jobs:
       id: 'semantic-release'
       uses: cycjimmy/semantic-release-action@v4.1.0
       with:
-#        dry_run: true # TODO: Remove this line
         semantic_version: 22.0.8
         extra_plugins: |
           @semantic-release/changelog
@@ -59,47 +53,3 @@ jobs:
         echo "Last version: ${{ steps.semantic-release.outputs.last_release_version }}"
         echo "Last GitHead: ${{ steps.semantic-release.outputs.last_release_git_head }}"
         echo "Last GitTag: ${{ steps.semantic-release.outputs.last_release_git_tag }}"
-
-    - name: 'Set up Docker Buildx'
-      uses: docker/setup-buildx-action@v3
-
-    - name: Build Docker
-      run: |
-        docker build -f Dockerfile . -t ${{ env.IMAGE_NAME }}:${{ steps.semantic-release.outputs.new_release_version }}
-
-    # - name: Extract metadata (tags, labels) for Docker
-    #   id: meta
-    #   uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-    #   with:
-    #     images: ${{ env.IMAGE_NAME }}
-    #     tags: |
-    #       ${{ steps.semantic-release.outputs.new_release_version }}
-    #       latest
-
-    # - name: 'Show metadata'
-    #   run: |
-    #     echo "Show metadata"
-    #     echo "Tags: ${{ steps.meta.outputs.tags }}"
-
-    # - name: 'Build and'
-    #   uses: docker/build-push-action@v5
-    #   with:
-    #     context: .
-    #     push: false
-    #     tags: ${{ steps.meta.outputs.tags }}
-    #     labels: ${{ steps.meta.outputs.labels }}
-
-    - name: 'Show Docker Image'
-      run: |
-        docker image ls
-
-    - name: 'Save Docker Image'
-      run: |
-        docker save -o ${{ env.IMAGE_NAME }}.tar ${{ env.IMAGE_NAME }}:${{ steps.semantic-release.outputs.new_release_version }}
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ env.IMAGE_NAME }}
-        path: ${{ env.IMAGE_NAME }}.tar
-        retention-days: 1
