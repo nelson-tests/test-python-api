@@ -20,38 +20,9 @@ env:
 
 
 jobs:
-  cancel-pending-approvals:
-    name: 'Cancel Pending Approvals'
-    runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    steps:
-    - name: 'Get tag'
-      id: tag
-      uses: dawidd6/action-get-tag@v1
-
-    - name: 'Install GitHub CLI'
-      run: sudo apt-get install gh
-
-    - name: 'Cancel Pending Deployments'
-      run: |
-        PENDING_DEPLOYMENTS=$(gh api repos/${{ github.repository }}/deployments \
-          --jq '.[] | select(.state == "in_progress" or .state == "queued") | .id')
-
-        for deployment_id in $(echo $PENDING_DEPLOYMENTS | tr '\n' ' '); do
-          echo "Canceling deployment $deployment_id"
-          gh api repos/${{ github.repository }}/deployments/$deployment_id/statuses \
-            -f state=inactive \
-            -f log_url=${{ github.event.workflow_run.html_url }} \
-            -f description="Superseded by a new commit from new deployment version: '${{ steps.tag.outputs.tag }}'" \
-            -F environment_url=${{ github.server_url }}/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        done
-
   build:
     name: 'Building Docker Image'
     runs-on: ubuntu-latest
-    needs: cancel-pending-approvals
 
     steps:
     - name: 'Checkout'
