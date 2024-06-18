@@ -22,7 +22,13 @@ def get_data():
             {'name': 'Grace', 'age': 55},
             {'name': 'Heidi', 'age': 60},
             {'name': 'Ivan', 'age': 65},
-            {'name': 'Judy', 'age': 70}
+            {'name': 'Judy', 'age': 70},
+            {'name': 'Kevin', 'age': 75},
+            {'name': 'Linda', 'age': 80},
+            {'name': 'Michael', 'age': 85},
+            {'name': 'Nancy', 'age': 90},
+            {'name': 'Oliver', 'age': 95},
+            {'name': 'Pamela', 'age': 100}
         ]
     }
     return jsonify(response)
