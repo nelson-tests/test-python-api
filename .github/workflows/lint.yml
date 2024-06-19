@@ -23,10 +23,6 @@ jobs:
   lint-analysis:
     name: "Lint Analysis"
     runs-on: ubuntu-latest
-    # permissions:
-    #   packages: write
-    #   security-events: write
-    #   id-token: write
 
     steps:
     - name: Obtendo o código fonte
