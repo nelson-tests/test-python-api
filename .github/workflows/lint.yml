@@ -54,13 +54,17 @@ jobs:
     #     username: ${{ secrets.DOCKERHUB_USERNAME }}
     #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: 'Docker build'
-      uses: docker/build-push-action@v5.3.0
-      with:
-        context: .
-        file: ./Dockerfile
-        push: false
-        tags: ${{ env.BASE_IMAGE_NAME }}:latest
+    - name: Build Docker
+      run: |
+        docker build -f ./Dockerfile . -t ${{ env.BASE_IMAGE_NAME }}:latest
+
+    # - name: 'Docker build'
+    #   uses: docker/build-push-action@v5.3.0
+    #   with:
+    #     context: .
+    #     file: ./Dockerfile
+    #     push: false
+    #     tags: ${{ env.BASE_IMAGE_NAME }}:latest
 
     - name: 'Docker show image'
       run: docker image ls

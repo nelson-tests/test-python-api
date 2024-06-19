@@ -37,7 +37,7 @@ jobs:
 
     - name: Build Docker
       run: |
-        docker build -f Dockerfile . -t ${{ env.BASE_IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+        docker build -f ./Dockerfile . -t ${{ env.BASE_IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
 
     - name: 'Save Docker Image'
       run: |
