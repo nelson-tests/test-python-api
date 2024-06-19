@@ -1,0 +1,79 @@
+name: 'Lint pipeline'
+
+
+on:
+  workflow_dispatch: # To can dispatch manually
+
+  pull_request:
+    types: [opened, reopened, edited, synchronize]
+    branches:
+      - main
+
+
+env:
+  BASE_IMAGE_NAME: 'test-python-api'
+
+
+jobs:
+
+  lint-analysis:
+    name: "Lint Analysis"
+    runs-on: ubuntu-latest
+    # permissions:
+    #   packages: write
+    #   security-events: write
+    #   id-token: write
+
+    steps:
+    - name: Obtendo o código fonte
+      uses: actions/checkout@v4.1.2
+
+    - name: 'Create reports directory'
+      run: mkdir reports
+
+    - name: 'Dockerfile Lint'
+      uses: hadolint/hadolint-action@v3.1.0
+      with:
+        dockerfile: ./Dockerfile
+        no-fail: true
+        output-file: reports/dockerfile-lint-report.sarif
+        format: sarif
+
+    - name: 'Upload lint report'
+      uses: actions/upload-artifact@v4
+      with:
+        path: reports
+        name: dockerfile-lint-report
+
+    - name: 'Set up Docker Buildx'
+      uses: docker/setup-buildx-action@v3
+
+    - name: 'Log in to Docker Hub'
+      uses: docker/login-action@v3.1.0
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Docker build
+      uses: docker/build-push-action@v5.3.0
+      with:
+        context: .
+        file: ./Dockerfile
+        push: false
+        tags: ${{ env.BASE_IMAGE_NAME }}:latest
+
+    - name: 'Scan Docker image'
+      uses: aquasecurity/trivy-action@0.20.0
+      with:
+        image-ref: ${{ env.BASE_IMAGE_NAME }}:latest
+        format: 'sarif'
+        exit-code: 0
+        scan-type: 'image'
+        severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+        output: 'reports/trivy-dockerimage-results.sarif'
+
+    - name: 'Upload trivy report'
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: reports
+        category: tools
