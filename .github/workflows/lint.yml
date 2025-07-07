@@ -56,7 +56,7 @@ jobs:
       run: docker image ls
 
     - name: 'Scan Docker image'
-      uses: aquasecurity/trivy-action@0.31.0
+      uses: aquasecurity/trivy-action@0.32.0
       with:
         image-ref: ${{ env.BASE_IMAGE_NAME }}:latest
         format: 'sarif'
