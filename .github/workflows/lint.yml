@@ -26,7 +26,7 @@ jobs:
 
     steps:
     - name: Obtendo o código fonte
-      uses: actions/checkout@v5.0.0
+      uses: actions/checkout@v5.0.1
 
     - name: 'Create reports directory'
       run: mkdir reports
